@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uni-Cart</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='Uni cart.png') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <section id="header">
+        <div class="logo-search">
+            <a href="/"><img src="{{ url_for('static', filename='Uni cart.png') }}" class="logo" alt="Uni-Cart Logo"></a>
+            <div class="header-search">
+                <input type="text" id="searchInput" placeholder="Search for products...">
+                <button type="button" onclick="searchImages()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+
+        <div class="header-title">
+            <span class="uni">Uni</span>-<span class="cart">Cart</span>
+        </div>
+
+        <div>
+            <ul id="navbar">
+                <li><a class="active" href="/">Home</a></li>
+                <li><a href="/shop">Shop</a></li>
+                <li><a href="/sell">Sell</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ===== HERO ===== -->
+    <section id="hero">
+        <h4>Welcome to Uni-Cart</h4>
+        <h1>Built for the campus</h1>
+        <p>Your marketplace, your people, your prices</p>
+        <a href="/shop"><button>Shop Now</button></a>
+    </section>
+
+    <!-- ===== RECENT LISTINGS ===== -->
+    <section id="recent-listings">
+        <div class="section-header">
+            <h2>Recently Listed</h2>
+        </div>
+        <div class="listings-wrapper">
+            <div class="listings-grid" id="gallery">
+                {% if images %}
+                    {% for image in images %}
+                    <a href="#" class="card"
+                       data-title="{{ image.title }}"
+                       data-description="{{ image.description }}"
+                       data-place="{{ image.place }}">
+                        <div class="card-img">
+                            <img src="{{ image.url }}" alt="{{ image.title }}">
+                        </div>
+                        <div class="card-info">
+                            <h3>{{ image.title }}</h3>
+                            <p>₹{{ image.price }}</p>
+                            <span style="font-size:12px;color:#888;">{{ image.place }} &middot; {{ image.date }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <p style="color:#999;font-size:1rem;margin-top:20px;grid-column:1/-1;">
+                        No listings yet — be the first to sell!
+                    </p>
+                {% endif %}
+            </div>
+            <a href="/shop" class="more-btn">More →</a>
+        </div>
+    </section>
+
+    <!-- ===== BANNER — SELL ===== -->
+    <section id="banner">
+        <div class="banner-content">
+            <h2>Sell your items on Uni-Cart</h2>
+            <p>A perfect place to sell your items on campus.</p>
+            <a href="/sell"><button>Start Selling</button></a>
+        </div>
+    </section>
+
+    <!-- ===== BANNER 2 — BUY ===== -->
+    <section id="banner2">
+        <div class="banner-content2">
+            <h2>Buy goods on Uni-Cart</h2>
+            <p>A perfect place to buy items on campus.</p>
+            <a href="/shop"><button>Start Buying</button></a>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo">UC</div>
+                    <p>Your campus marketplace for buying and selling items easily.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="/shop">Shop</a>
+                    <a href="/sell">Sell</a>
+                    <a href="/about">About</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <a href="/about">About Us</a>
+                    <a href="/contact">Contact Us</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Uni-Cart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <script>
+        const allCards = document.querySelectorAll('.card[data-title]');
+        const cardData = Array.from(allCards).map(card => ({
+            title:       card.getAttribute('data-title'),
+            description: card.getAttribute('data-description'),
+            place:       card.getAttribute('data-place')
+        }));
+
+        const fuse = new Fuse(cardData, {
+            keys: ['title', 'description', 'place'],
+            threshold: 0.4
+        });
+
+        function searchImages() {
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) {
+                allCards.forEach(c => c.style.display = 'block');
+                return;
+            }
+            const hits = fuse.search(input).map(r => r.item.title.toLowerCase());
+            allCards.forEach(card => {
+                const t = card.getAttribute('data-title').toLowerCase();
+                card.style.display = hits.includes(t) ? 'block' : 'none';
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', e => {
+            if (e.key === 'Enter') searchImages();
+        });
+    </script>
+
+    <style>
+        .delete-btn {
+            width: 100%;
+            padding: 7px;
+            background: white;
+            color: black;
+            border: 2px solid black;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .delete-btn:hover { background: black; color: white; }
+    </style>
+
+</body>
+</html>

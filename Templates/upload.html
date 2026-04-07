@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uni-Cart — Sell</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='Uni cart.png') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <section id="header">
+        <div class="logo-search">
+            <a href="/"><img src="{{ url_for('static', filename='Uni cart.png') }}" class="logo" alt="Uni-Cart Logo"></a>
+        </div>
+
+        <div class="header-title">
+            <span class="uni">Uni</span>-<span class="cart">Cart</span>
+        </div>
+
+        <div>
+            <ul id="navbar">
+                <li><a href="/">Home</a></li>
+                <li><a href="/shop">Shop</a></li>
+                <li><a class="active" href="/sell">Sell</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ===== UPLOAD FORM ===== -->
+    <div class="page-wrapper">
+        <div class="upload-card">
+            <h2>List an Item</h2>
+            <p class="subtitle">Fill in the details below to list your item on Uni-Cart</p>
+
+            <form method="POST" enctype="multipart/form-data" action="/sell">
+
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" name="name" placeholder="e.g. Lalrindika" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Item Title</label>
+                    <input type="text" name="title" placeholder="e.g. Scientific Calculator" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Describe the item, its condition, etc." rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="number" name="price" placeholder="e.g. 500" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date Available</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Email</label>
+                        <input type="email" name="email" placeholder="e.g. you@example.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Meeting Place</label>
+                    <input type="text" name="place" placeholder="e.g. Near MZU Library" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Image</label>
+                    <label class="file-label" for="fileInput">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span id="fileLabelText">Choose an image to upload</span>
+                    </label>
+                    <input type="file" name="image" accept="image/*" required id="fileInput" style="display:none;">
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-tag"></i>&nbsp; List Item
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo">UC</div>
+                    <p>Your campus marketplace for buying and selling items easily.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="/shop">Shop</a>
+                    <a href="/sell">Sell</a>
+                    <a href="/about">About</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <a href="/about">About Us</a>
+                    <a href="/contact">Contact Us</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Uni-Cart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function () {
+            const name = this.files[0] ? this.files[0].name : 'Choose an image to upload';
+            document.getElementById('fileLabelText').textContent = name;
+        });
+    </script>
+
+</body>
+</html>

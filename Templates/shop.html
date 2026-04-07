@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uni-Cart — Shop</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='Uni cart.png') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+
+    <section id="header">
+        <div class="logo-search">
+            <a href="/"><img src="{{ url_for('static', filename='Uni cart.png') }}" class="logo" alt="Uni-Cart Logo"></a>
+            <div class="header-search">
+                <input type="text" id="searchInput" placeholder="Search for products...">
+                <button type="button" onclick="searchProducts()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+
+        <div class="header-title">
+            <span class="uni">Uni</span>-<span class="cart">Cart</span>
+        </div>
+
+        <div>
+            <ul id="navbar">
+                <li><a href="/">Home</a></li>
+                <li><a class="active" href="/shop">Shop</a></li>
+                <li><a href="/sell">Sell</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="shop-section">
+        <div class="section-header" style="padding: 40px 8% 20px 8%;">
+            <h2>All Listings</h2>
+            <p style="color:#888; font-size:14px; margin-top:6px;">{{ products|length }} item{{ 's' if products|length != 1 }} available</p>
+        </div>
+
+        <div class="shop-grid" id="shopGrid">
+            {% if products %}
+                {% for p in products %}
+                <div class="shop-card" data-title="{{ p.title }}" data-description="{{ p.description }}" data-place="{{ p.place }}">
+                    <div class="shop-card-img">
+                        <img src="{{ p.url }}" alt="{{ p.title }}">
+                    </div>
+                    <div class="shop-card-info">
+                        <h3>{{ p.title }}</h3>
+                        <p class="shop-price">₹{{ p.price }}</p>
+                        <p class="shop-desc">{{ p.description }}</p>
+                        <div class="shop-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> {{ p.place }}</span>
+                            <span><i class="fas fa-calendar-alt"></i> {{ p.date }}</span>
+                        </div>
+                        <button class="interested-btn" onclick="sendInterest('{{ p.email }}', '{{ p.title }}', '{{ p.name }}', this)">
+                            <i class="fas fa-envelope"></i> I'm Interested
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color:#999; font-size:1rem; padding: 0 8% 60px 8%;">No listings yet — be the first to sell!</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo">UC</div>
+                    <p>Your campus marketplace for buying and selling items easily.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="/shop">Shop</a>
+                    <a href="/sell">Sell</a>
+                    <a href="/about">About</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <a href="/about">About Us</a>
+                    <a href="/contact">Contact Us</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Uni-Cart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <script>
+        async function sendInterest(sellerEmail, productTitle, sellerName, btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            try {
+                const res = await fetch('/interested', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ seller_email: sellerEmail, product_title: productTitle, seller_name: sellerName })
+                });
+                if (res.ok) {
+                    btn.innerHTML = '<i class="fas fa-check"></i> Notified!';
+                    btn.style.background = '#088178';
+                    btn.style.borderColor = '#088178';
+                } else { throw new Error(); }
+            } catch {
+                btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed, try again';
+                btn.disabled = false;
+                btn.style.background = '#d04040';
+                btn.style.borderColor = '#d04040';
+            }
+        }
+        const allCards = document.querySelectorAll('.shop-card[data-title]');
+        const cardData = Array.from(allCards).map(card => ({
+            title:       card.getAttribute('data-title'),
+            description: card.getAttribute('data-description'),
+            place:       card.getAttribute('data-place')
+        }));
+
+        const fuse = new Fuse(cardData, {
+            keys: ['title', 'description', 'place'],
+            threshold: 0.4
+        });
+
+        function searchProducts() {
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) {
+                allCards.forEach(c => c.style.display = 'block');
+                return;
+            }
+            const hits = fuse.search(input).map(r => r.item.title.toLowerCase());
+            allCards.forEach(card => {
+                const t = card.getAttribute('data-title').toLowerCase();
+                card.style.display = hits.includes(t) ? 'block' : 'none';
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', e => {
+            if (e.key === 'Enter') searchProducts();
+        });
+    </script>
+
+
+</body>
+</html>
